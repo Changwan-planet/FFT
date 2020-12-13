@@ -2,14 +2,21 @@ Program FFT
 Implicit none
 
 !INPUT DATA & INITIALIZATION
-INTEGER, PARAMETER :: N=1024  !THE NUMBER OF SAMPLE POINTS
-COMPLEX,Dimension(N) :: x  !DATA VECTOR. IMAGINARTY PART SHOULD BE SET TO  ZERO.
-COMPLEX :: 
-INTEGER :: gam
-INTEGER :: l=1                !ARRAY NUMBER
-INTEGER :: N
+INTEGER,PARAMETER :: N=4      !THE NUMBER OF SAMPLE POINTS
+INTEGER           :: K        !SAMPLE POINT
+REAL, DIMENSION :: XREAL
+REAL, DIMENSION :: XIMAG
+
+!COMPLEX,Dimension(N) :: x  !DATA VECTOR. IMAGINARTY PART SHOULD BE SET TO  ZERO.
+
+
+
 INTEGER :: N2                 !THE SPACING BETWEEN DUAL NODES
-INTEGER :: NU
+
+INTEGER :: NU                 !GAMMA 
+INTEGER :: L=1                !GAMMA FOR DO LOOP                  
+
+ 
 INTEGER :: NU1                !THE NU1 IS THE RIGHT SHIFT REQUIRED WHEN DETERMINING THE VALUE OF P.
 INTEGER :: I                  !THIS COUNTER MONITORS THE NUMBER OF DUAL
 !NODE PAIRS THAT HAVE BEEN CONSIDERED.                
@@ -19,17 +26,38 @@ INTEGER :: M
 INTEGER :: T1                 !TEMPORARY VALUE
 INTEGER :: T3                 !TEMPORARY VALUE
 
-!RELATIONSHIP
-gam=log2(N)
-NU=gam
-N2=N/(2**(l))            
-NU1=gam-l
+!RELATIONSHIPS & INITIALIZATION 
+K=0
+
+!NU1 = NU-1 
+
+!DEFINE NU (GAMMA)
+NU = 0
+    
+DO WHILE(N==1)
+
+  N=N/2
+  NU=NU+1
+
+END DO 
 
 
-100 IF (l < gam)    !TO SEE IF ALL ARRAYS HAVE BEEN COMPUTED
-110    I=1
+PRINT*, "NU (GAMMA)=",NU
 
-120    M=INT(k/(2**NU1)) 
+  DO L=1,NU
+
+     N2 = N /2**(L)
+
+      DO I=1,N2
+       
+        !J=I/(2**(L))            
+        NU1=NU-L
+
+
+!100 IF (L < NU)    !TO SEE IF ALL ARRAYS HAVE BEEN COMPUTED
+!110    I=1
+
+120    M=INT(I/(2**NU1)) 
 
        P=IBR(M)
 
@@ -51,7 +79,7 @@ NU1=gam-l
                   k=0
                   GO TO 100
           
-    ELSE IF (l > gam) !WE PROCEED TO UNSCRAMBLE THE FINAL RESULTS
+!    ELSE IF (L > NU) !WE PROCEED TO UNSCRAMBLE THE FINAL RESULTS
 
 130     i=IBR(k)
          
@@ -77,11 +105,7 @@ NU1=gam-l
 
 FUNCTION IBR(M)
 
-INTEGER :: M
-INTEGER :: NU
-INTEGER :: J2
-INTEGER :: I1
-INTEGER :: IBR
+INTEGER :: M, NU, J2, I1, IBR
 
 !INITIALIZATION
 I1 = 1
