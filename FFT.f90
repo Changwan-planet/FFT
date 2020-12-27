@@ -2,126 +2,179 @@ Program FFT
 Implicit none
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: N=4      !THE NUMBER OF SAMPLE POINTS
+INTEGER,PARAMETER :: S=16      !THE NUMBER OF SAMPLE POINT
+INTEGER           :: N        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
+REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
-REAL, DIMENSION :: XREAL
-REAL, DIMENSION :: XIMAG
+
+!REAL, DIMENSION(S) :: X
+REAL*8, DIMENSION(S) :: XREAL
+REAL*8, DIMENSION(S) :: XIMAG
 
 !COMPLEX,Dimension(N) :: x  !DATA VECTOR. IMAGINARTY PART SHOULD BE SET TO  ZERO.
-
 
 
 INTEGER :: N2                 !THE SPACING BETWEEN DUAL NODES
 
 INTEGER :: NU                 !GAMMA 
-INTEGER :: L=1                !GAMMA FOR DO LOOP                  
+INTEGER :: L=1                !GAMMA FOR DO LOOP (ARRAY NUMBER BEING CONSIDERED)                 
 
- 
+INTEGER :: P
 INTEGER :: NU1                !THE NU1 IS THE RIGHT SHIFT REQUIRED WHEN DETERMINING THE VALUE OF P.
 INTEGER :: I                  !THIS COUNTER MONITORS THE NUMBER OF DUAL
 !NODE PAIRS THAT HAVE BEEN CONSIDERED.                
 !THE COUNTER I IS THE CONTROL FOR DETERMINING WHEN THE PROGRAM MUST SKIP.
-COMPLEX :: W=EXP(-2*PI()/N)
+
+COMPLEX :: W=EXP(-2*pi/S)
+
 INTEGER :: M 
 INTEGER :: T1                 !TEMPORARY VALUE
 INTEGER :: T3                 !TEMPORARY VALUE
+INTEGER ::  t
+REAL*8 :: f=1.0d+1
+
+OPEN(10, FILE="sine_testFFT.txt", status='replace')
+OPEN(11, FILE="output_testFFT.txt",status='replace')
+
+!=======INPUTDATA=============
+f=1
+Do t=1,S/2
+   XREAL(t)=cos(2*pi*f*((t-1)/(S-1)))
+   Print *, "====start==="
+   Print *, f
+   Print *, pi
+   Print *, t
+   Print *, S
+   Print *, "test=",2*pi*f*(t-1)/(S-1)
+   Print *, 2*pi*f*((t-1)/(S-1))
+   Print *, "XREAL(",t,")=",XREAL(t)
+   !Print *, pi
+   !Print *, sin(2*pi/4)
+   !WRITE(10,*) XREAL(t)
+END DO 
+   !Print *, XREAL
+!=============================
+
 
 !RELATIONSHIPS & INITIALIZATION 
 K=0
 
-!NU1 = NU-1 
-
-!DEFINE NU (GAMMA)
+!======DEFINE NU (GAMMA)=======
 NU = 0
     
 DO WHILE(N==1)
 
-  N=N/2
+  N=INT(S/2)
   NU=NU+1
 
 END DO 
+!==============================
 
 
 PRINT*, "NU (GAMMA)=",NU
 
   DO L=1,NU
 
-     N2 = N /2**(L)
+     N2 = INT(S /2**(L))
 
-      DO I=1,N2
+    
+110   DO I=1,N2
        
+        PRINT *, "I=",I, "N2=",N2
         !J=I/(2**(L))            
-        NU1=NU-L
+         NU1=NU-L
 
 
 !100 IF (L < NU)    !TO SEE IF ALL ARRAYS HAVE BEEN COMPUTED
-!110    I=1
 
-120    M=INT(I/(2**NU1)) 
 
-       P=IBR(M)
+120      M=INT(K/(2**NU1)) 
+         CALL bit_reversing(m,NU,P)      
+         !P=br
+         print *, "P=",P
+         !P=bit_reversing(m)
 
-       T1=(W**p)*x(k+N2)    
+         T1=(W**P)*XREAL(K+N2) 
 
-       k=k+1
+         XREAL(K+N2) = XREAL(K) - T1
+         XREAL(K) = XREAL(K) + T1
 
-       IF (I /= N2) 
-          GO TO 120
+         K=K+1
+
+           IF (I /= N2) THEN
+
+             GO TO 120
        
-       ELSE IF 
-          k=k+N2
-               IF (k < N -1)
-                  GO TO 110
-               ELSE IF
-                  l=l+1
-                  N2=N2/2
-                  NU1=NU1-1
-                  k=0
-                  GO TO 100
-          
-!    ELSE IF (L > NU) !WE PROCEED TO UNSCRAMBLE THE FINAL RESULTS
+           ELSE
 
-130     i=IBR(k)
-         
-         IF (i<k)   
+             K=K+N2
+               IF (K < S -1) THEN
+                  GO TO 110
+               ELSE 
+                  N2=INT(N2/2)
+                  NU1=NU1-1
+                  K=0
+                  GO TO 130
+               END IF
+            END IF    
+
+         END DO
+!    ELSE IF (L > NU) !WE PROCEED TO UNSCRAMBLE THE FINAL RESULTS
+   END DO
+
+!==============UNSCRAMBLE THE COMPUTED RESULTS BY BIT INVERSION=================   
+        
+130     CALL bit_reversing(k,NU,i)
+        print *, "i=",i 
+         IF (i<K) THEN  
 
 !THIS STEP IS NECESSARY TO PROHIBIT THE ALTERING OF PREVIOUSLY UNSCRAMBLED
 !NODES.
+ 
+         GO TO 140
 
-140          IF (k=N-1)
-
-                STOP
-             ELSE IF 
-                k = k + 1
-                GO TO 130 
-         ELSE IF 
-             T3=x(k)
-             x(k) = x(i)
-             x(i)=T3
-             GO TO 140 
+         ELSE 
+             T3=XREAL(K)
+             XREAL(K) = XREAL(i)
+             XREAL(i)=T3
+             GO TO 140
+         END IF    
 
 
-             
-
-FUNCTION IBR(M)
-
-INTEGER :: M, NU, J2, I1, IBR
-
-!INITIALIZATION
-I1 = 1
-IBR = 0
+140      IF (K==S-1) THEN
+             STOP
+         ELSE
+             K = K + 1
+             GO TO 130
+         END IF
+!================================================================================
 
 
-150  IF (I1>NU)
-        RETURN IBR
+CONTAINS
+            
+ SUBROUTINE  bit_reversing(m,NU,br)
+   IMPLICIT NONE
+   INTEGER              :: m, NU
+   INTEGER              :: j2, i1
+   INTEGER, INTENT(OUT) :: br
+
+   !INITIALIZATION
+     i1 = 1
+     br = 0
+
+150  IF (i1>NU) THEN
+         RETURN 
     
-     ELSE IF
-            J2 = M/2
-            IBR = 2*IBR + (M-2*J2)
-            M = J2
+     ELSE 
+         j2 = INT(m/2)
+         br = 2*br + (m-2*j2)
+         m  = j2
 
-            I1=I1+1
+         i1=i1+1
 
-            GO TO 150
+         GO TO 150
+     END IF 
 
+ END SUBROUTINE bit_reversing
 
+END PROGRAM FFT
