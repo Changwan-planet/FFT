@@ -30,7 +30,7 @@ COMPLEX :: W=EXP(-2*pi/S)
 INTEGER :: M 
 INTEGER :: T1                 !TEMPORARY VALUE
 INTEGER :: T3                 !TEMPORARY VALUE
-INTEGER :: t
+INTEGER :: t,br
 REAL*8 :: f=1.0d+1
 
 OPEN(10, FILE="sine_testFFT.txt", status='replace')
@@ -42,7 +42,7 @@ f=1
 Do t=1, S
 
    XREAL(t)=cos(2*pi*f*(t-1)/(S-1))
-!   Print *, "XREAL(",t,")=",XREAL(t)
+   !Print *, "XREAL(",t,")=",XREAL(t)
    WRITE(10,*) XREAL(t)
 
 END DO 
@@ -51,8 +51,10 @@ END DO
 
 
 !RELATIONSHIPS & INITIALIZATION 
-K = 0
 NU = 0
+T1 = 0
+T3 = 0 
+K = 0
 !======DEFINE NU (GAMMA)=======
 !NU = 0
     
@@ -92,15 +94,25 @@ PRINT*, "NU(GAMMA)=",NU
 120      M=INT(K/(2**NU1)) 
          PRINT*, "M=",M
          CALL bit_reversing(m,NU,P)      
-         !P=br
+         
          print *, "P=",P
          !P=bit_reversing(m)
+         
+         print *, "T1_1=",T1
+         print *, "W=",W
+         print *, "K=",K
+         print *, "K+N2=",K+N2
+         print *, "XREAL(K)=",XREAL(K)
+         print *, "XREAL(K+N2)=",XREAL(K+N2)
 
          T1=(W**P)*XREAL(K+N2) 
-
+         print *, "T1_2=",T1
+         
          XREAL(K+N2) = XREAL(K) - T1
-         XREAL(K) = XREAL(K) + T1
+         print *, "XREAL(K+N2)_2=",XREAL(K+N2)
 
+         XREAL(K) = XREAL(K) + T1
+         print *, "XREAL(K)_2=",XREAL(K)      
          K=K+1
 
            IF (I /= N2) THEN
@@ -127,6 +139,7 @@ PRINT*, "NU(GAMMA)=",NU
 !==============UNSCRAMBLE THE COMPUTED RESULTS BY BIT INVERSION=================   
         
 130     CALL bit_reversing(k,NU,i)
+        
         print *, "i=",i 
          IF (i<K) THEN  
 
@@ -156,32 +169,39 @@ CONTAINS
             
  SUBROUTINE  bit_reversing(m,NU,br)
    IMPLICIT NONE
-   INTEGER              :: m,NU
-   INTEGER              :: j2, i1
+   INTEGER              :: m
+   INTEGER, INTENT(IN)  :: NU
    INTEGER, INTENT(OUT) :: br
+   
+   INTEGER              :: j2, i1  
 
    !INITIALIZATION
      i1 = 1
      br = 0
+     j2 = 0
      PRINT*, "m=",m
      PRINT*, "NU=",NU
-     PRINT*, "br1=",br
+     PRINT*, "br_1=",br
 
 150  IF (i1>NU) THEN
-         RETURN 
-    
+     RETURN
      ELSE 
+         print *, "j2_1=",j2
          j2 = INT(m/2)
+         print *, "j2_2=",j2
          br = 2*br + (m-2*j2)
-         !PRINT*, "br2=",br
+         print *, "br_2=",br
          m  = j2
-
+         
+         print *, "i1_1=",i1
          i1=i1+1
+         print *, "i1_2=",i1
 
          GO TO 150
+     
      END IF 
-    
-    PRINT*, "br3=",br   
+
+    PRINT*, "br_3=",br   
  END SUBROUTINE bit_reversing
 
 END PROGRAM FFT
