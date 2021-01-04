@@ -2,14 +2,14 @@ Program FFT
 Implicit none
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: S=8        !THE NUMBER OF SAMPLE POINT
+INTEGER,PARAMETER :: S=4     !THE NUMBER OF SAMPLE POINT
 INTEGER           :: N=S        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
 REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
 
 !REAL, DIMENSION(S) :: X
-REAL*8, DIMENSION(S) :: XREAL
-REAL*8, DIMENSION(S) :: XIMAG
+COMPLEX*8, DIMENSION(S) :: XREAL
+COMPLEX*8, DIMENSION(S) :: XIMAG
 
                                !COMPLEX,Dimension(N) :: x  !DATA VECTOR. IMAGINARTY PART SHOULD BE SET TO  ZERO.
 
@@ -24,11 +24,11 @@ INTEGER :: NU1                !THE NU1 IS THE RIGHT SHIFT REQUIRED WHEN DETERMIN
 INTEGER :: I                  !THIS COUNTER MONITORS THE NUMBER OF DUAL NODE PAIRS THAT HAVE BEEN CONSIDERED.                                            !THE COUNTER I IS THE CONTROL FOR DETERMINING WHEN THE PROGRAM MUST SKIP.
 INTEGER :: I_INTEGER
 
+IMAGINE
+COMPLEX*8 :: W=EXP(-2*pi/S)
 
-REAL*8 :: W=EXP(-2*pi/S)
-
-REAL*8 :: T1  !TEMPORARY VALUE
-REAL*8 :: T3  !TEMPORARY VALUE
+COMPLEX*8 :: T1  !TEMPORARY VALUE
+COMPLEX*8 :: T3  !TEMPORARY VALUE
 INTEGER :: T4 !TEMPORARY VALUE
 
 !INTEGER :: BD !BINARY DIGIT
@@ -39,19 +39,19 @@ INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED_REVERSED
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY_REVERSED
 
-REAL*8 :: f
+INTEGER :: f
 
 OPEN(10, FILE="sine_testFFT.txt", status='replace')
 OPEN(11, FILE="output_testFFT.txt",status='replace')
 
 !=======INPUTDATA=============
-f=5
+f=1
 XREAL=0
 
 Do t=0, S-1
 
    XREAL(t)=cos(2*pi*f*(t)/(S-1))
-   Print *, "XREAL(",t,")=",XREAL(t)
+   Print "(a,i4,a,f20.16)", "XREAL(",t,")=",XREAL(t)
    WRITE(10,*) XREAL(t)
 
 END DO 
@@ -99,9 +99,9 @@ T4 = S-1
    PRINT *, ""
    PRINT *, "**********************************************************"
    PRINT *, "T4 MEANS THE LAST VALUE OF THE K"
-   PRINT *, "T4=",T4
+   PRINT "(a,i4)", "T4=",T4
    PRINT *, "BD MENAS THE DIGIT WHEN THE K TURN INTO BINDARY NUMBER."
-   PRINT *, "BD=",NU
+   PRINT "(a,i4)", "BD=",NU
    PRINT *, "**********************************************************"
    PRINT *, ""
 
@@ -116,8 +116,9 @@ T4 = S-1
 !=====W**P DETERPEMATION==========================================
 130      PRINT *,""
          PRINT *, "**********************************************************************"
-         PRINT *, "K=",K,"NU-L=NU1=",NU1 
-         PRINT *, "L=",L,"NU(GAMMA)=",NU,"I=",I, "N2=",N2
+         PRINT "(a,i4,4X,a,i2)", "K=",K,"NU-L=NU1=",NU1 
+         PRINT "(a,i4,4X,a,i2,4X,a,i2,4X,a,i2)", &
+               "L=",L,"NU(GAMMA)=",NU,"I=",I, "N2=",N2
          PRINT *, "**********************************************************************"
          PRINT *, "" 
          
@@ -141,31 +142,34 @@ T4 = S-1
          
          !PRINT *, "P_INTEGER=",P_INTEGER
 
-         PRINT *, "K=",K
-         PRINT *, "K+N2=",K+N2
+         PRINT "(a,i4)", "K=",K
+         PRINT "(a,i4)", "K+N2=",K+N2
          PRINT *, ""
-         PRINT *, "XREAL(",K,")=",XREAL(K)
-         PRINT *, "XREAL(",K+N2,")=",XREAL(K+N2)
+         PRINT "(a,i4,a,f20.16)", "XREAL(",K,")=",XREAL(K)
+         PRINT "(a,i4,a,f20.16)", "XREAL(",K+N2,")=",XREAL(K+N2)
          PRINT *, ""
-         PRINT *, "T1_1=",T1
-         PRINT *, "W=",W
-         PRINT *, "P_INTEGER=",P_INTEGER
-         PRINT *, "W**P_INTEGER",W**(P_INTEGER)
+         PRINT "(a,f20.16)", "T1_1=",T1
+         PRINT "(a,f20.16)", "W=",W
+         PRINT "(a,i4)", "P_INTEGER=",P_INTEGER
+         PRINT "(a,f20.16)", "W**P_INTEGER",W**(P_INTEGER)
 
 !==================================================================
 
          T1=(W**P_INTEGER)*XREAL(K+N2) 
          
-         PRINT *, "T1_2=",T1
+         PRINT "(a,f20.16)", "T1_2=",T1
 
          PRINT *,""
          PRINT *,""
          
          XREAL(K+N2) = XREAL(K) - T1
-         PRINT *, "XREAL(",K+N2,")_2=XREAL(",K,")-",T1,"=",XREAL(K+N2)
+         PRINT "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
+                  "XREAL(",K+N2,")_2=XREAL(",K,")-",T1,"=",XREAL(K+N2)
 
          XREAL(K) = XREAL(K) + T1
-         PRINT *, "XREAL(",K,")_2=XREAL(",K,")+",T1,"=",XREAL(K)      
+         PRINT  "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
+                 "XREAL(",K,")_2=XREAL(",K,")+",T1,"=",XREAL(K)  
+
          K=K+1   !GO TO THE NEXT NODE
          
 !==================================================================
@@ -229,8 +233,8 @@ T4 = S-1
         IF (I_INTEGER < K) THEN
              PRINT *, ""
              PRINT *, "====I_INTEGER < K====="
-             PRINT *, "I_INTEGER=",I_INTEGER
-             PRINT *, "K=",K
+             PRINT "(a,i4)", "I_INTEGER=",I_INTEGER
+             PRINT "(a,i4)", "K=",K
              PRINT *, ""
 !             PRINT *, "K_2=",K
              GO TO 300
@@ -238,15 +242,17 @@ T4 = S-1
         ELSE
             PRINT *, ""
             PRINT *, "======UNSCRABLE========="
-            PRINT *, "XREAL_K(",K,")_1=",XREAL(K)
-            PRINT *, "XREAL_I(",I_INTEGER,")_1=",XREAL(I_INTEGER)
+            PRINT "(a,i4,a,f20.16)", "XREAL_K(",K,")_1=",XREAL(K)
+            PRINT "(a,i4,a,f20.16)", &
+                  "XREAL_I(",I_INTEGER,")_1=",XREAL(I_INTEGER)
             
             T3 = XREAL(K)
             XREAL(K) = XREAL(I_INTEGER)
             XREAL(I_INTEGER) = T3
             
-            PRINT *, "XREAL_K(",K,")_2=",XREAL(K)
-            PRINT *, "XREAL_I(",I_INTEGER,")_2=",XREAL(I_INTEGER)
+            PRINT "(a,i4,a,f20.16)", "XREAL_K(",K,")_2=",XREAL(K)
+            PRINT "(a,i4,a,f20.16)", &
+                  "XREAL_I(",I_INTEGER,")_2=",XREAL(I_INTEGER)
  
             GO TO 300
          
@@ -262,7 +268,7 @@ T4 = S-1
              !=====OUTPUTDATA=========================================    
              DO Z=1, S
 
-                PRINT *, "XREAL(",Z,")=",XREAL(Z)
+               PRINT "(a,i4,a,f20.16)", "XREAL(",Z,")=",XREAL(Z)
                 WRITE(11,*) XREAL(Z)
              END DO
              
