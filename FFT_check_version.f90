@@ -2,7 +2,7 @@ Program FFT
 IMPLICIT NONE
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: S=128  !THE NUMBER OF SAMPLE POINT
+INTEGER,PARAMETER :: S=256!THE NUMBER OF SAMPLE POINT
 INTEGER           :: N=S        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
 REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
@@ -51,21 +51,29 @@ OPEN(11, FILE="output_testFFT.txt",status='replace')
 f=20
 XREAL=0
 
-!Do t=0, S-1
-!   XREAL(t)=cos(2*pi*f*(t)/(S-1))
-!   Print "(a,i4,a,f20.16)", "XREAL(",t,")=",XREAL(t)
-!   WRITE(10,*) XREAL(t)
-!END DO 
+Do t=0, S-1
+   XREAL(t)=sin(2*pi*f*(t)/(S-1))
+   Print "(a,i4,a,f20.16)", "XREAL(",t,")=",XREAL(t)
+   WRITE(10,*) XREAL(t)
+END DO 
 
 !=============================
 !SIMPLIE SIGNAL
-Do t=0, S-1
+!constant-amplitude waveform
+!Do t=0, S-1
+!   XREAL(t)=1
+!   WRITE(10,*) XREAL(t)
 
-   XREAL(t)=1
-!   Print "(a,i4,a,f20.16)", "XREAL(",t,")=",XREAL(t)
-   WRITE(10,*) XREAL(t)
+!END DO 
 
-END DO 
+!symmetrical-puls waveform
+!Do t=0, S-1
+      
+!     XREAL(t)=1
+   
+!   WRITE(10,*) XREAL(t)
+
+!END DO 
 
 
 
@@ -107,14 +115,14 @@ T4 = S-1
 
    !BD=BINARY_DIGIT(T4)
    
-!   PRINT *, ""
-!   PRINT *, "**********************************************************"
-!   PRINT *, "T4 MEANS THE LAST VALUE OF THE K"
-!   PRINT "(a,i4)", "T4=",T4
-!   PRINT *, "BD MENAS THE DIGIT WHEN THE K TURN INTO BINDARY NUMBER."
-!   PRINT "(a,i4)", "BD=",NU
-!   PRINT *, "**********************************************************"
-!   PRINT *, ""
+   PRINT *, ""
+   PRINT *, "**********************************************************"
+   PRINT *, "T4 MEANS THE LAST VALUE OF THE K"
+   PRINT "(a,i4)", "T4=",T4
+   PRINT *, "BD MENAS THE DIGIT WHEN THE K TURN INTO BINDARY NUMBER."
+   PRINT "(a,i4)", "BD=",NU
+   PRINT *, "**********************************************************"
+   PRINT *, ""
 
    !ALLOCATE(K_BINARY(NU), STAT=ALLOCATESTATUS)
     !IF(ALLOCATESTATUS /= 0) STOP "***NOT ENOUGH MEMORY***"
@@ -126,12 +134,12 @@ T4 = S-1
     !     K=4 
 !=====W**P DETERPEMATION==========================================
 130      PRINT *,""
-!         PRINT *, "**********************************************************************"
-!         PRINT "(a,i4,4X,a,i2)", "K=",K,"NU-L=NU1=",NU1 
-!         PRINT "(a,i4,4X,a,i2,4X,a,i2,4X,a,i2)", &
-!               "L=",L,"NU(GAMMA)=",NU,"I=",I, "N2=(S/2**L)=",N2
-!         PRINT *, "**********************************************************************"
-!         PRINT *, "" 
+         PRINT *, "**********************************************************************"
+         PRINT "(a,i4,4X,a,i2)", "K=",K,"NU-L=NU1=",NU1 
+         PRINT "(a,i4,4X,a,i2,4X,a,i2,4X,a,i2)", &
+               "L=",L,"NU(GAMMA)=",NU,"I=",I, "N2=(S/2**L)=",N2
+         PRINT *, "**********************************************************************"
+         PRINT *, "" 
          
          CALL INTEGER2BINARY(K,NU,K_BINARY)
          !PRINT *, "CT(THE DIGIT OF BINARY NUMBER)=",CT 
@@ -155,34 +163,34 @@ T4 = S-1
 
          ARG = 2*pi*P_INTEGER/S
          !ARG=pi
-!         PRINT "(a,i4)", "K=",K
-!         PRINT "(a,i4)", "K+N2=",K+N2
-!         PRINT *, ""
-!         PRINT "(a,i4,a,f20.16)", "XREAL(K+N2)=XREAL(",K+N2,")=",XREAL(K+N2)
-!         PRINT "(a,i4,a,f20.16)", "XIMAG(K+N2)=XIMAG(",K+N2,")=",XIMAG(K+N2)
-!         PRINT "(a,i4,a,f20.16)", "XREAL(K)=XREAL(",K,")=",XREAL(K)
-!         PRINT "(a,i4,a,f20.16)", "XIMAG(K)=IMAG(",K,")=",XIMAG(K)
-!         PRINT *, ""
+         PRINT "(a,i4)", "K=",K
+         PRINT "(a,i4)", "K+N2=",K+N2
+         PRINT *, ""
+         PRINT "(a,i4,a,f20.16)", "XREAL(K+N2)=XREAL(",K+N2,")=",XREAL(K+N2)
+         PRINT "(a,i4,a,f20.16)", "XIMAG(K+N2)=XIMAG(",K+N2,")=",XIMAG(K+N2)
+         PRINT "(a,i4,a,f20.16)", "XREAL(K)=XREAL(",K,")=",XREAL(K)
+         PRINT "(a,i4,a,f20.16)", "XIMAG(K)=IMAG(",K,")=",XIMAG(K)
+         PRINT *, ""
           
-!         PRINT *,"K_BINARY=",K_BINARY  
-!         PRINT *, "K_BINARY_SCALED=",K_BINARY_SCALED
-!         PRINT *, "K_BINARY_SCALED_REVERSED=",K_BINARY_SCALED_REVERSED     
-!         PRINT "(a,i4)", "P_INTEGER=",P_INTEGER 
+         PRINT *,"K_BINARY=",K_BINARY  
+         PRINT *, "K_BINARY_SCALED=",K_BINARY_SCALED
+         PRINT *, "K_BINARY_SCALED_REVERSED=",K_BINARY_SCALED_REVERSED     
+         PRINT "(a,i4)", "P_INTEGER=",P_INTEGER 
 !==================================================================
          CC = COS(ARG)
          SS = SIN(ARG)
 
-!         PRINT *, ""
-!         PRINT *, "ARG=",ARG
-!         PRINT *, "COS(ARG)=",CC
-!         PRINT *, "SIN(ARG)=",SS
-!         PRINT *, ""
+         PRINT *, ""
+         PRINT *, "ARG=",ARG
+         PRINT *, "COS(ARG)=",CC
+         PRINT *, "SIN(ARG)=",SS
+         PRINT *, ""
          
          TREAL = XREAL(K+N2) * CC + XIMAG(K+N2) * SS
          TIMAG = XIMAG(K+N2) * CC - XREAL(K+N2) * SS
      
-!         PRINT "(a,f20.16)", "TREAL=",TREAL
-!         PRINT "(a,f20.16)", "TIMAG=",TIMAG
+         PRINT "(a,f20.16)", "TREAL=",TREAL
+         PRINT "(a,f20.16)", "TIMAG=",TIMAG
 
 
          XREAL(K+N2) = XREAL(K) - TREAL
@@ -190,17 +198,17 @@ T4 = S-1
          XREAL(K) = XREAL(K) + TREAL
          XIMAG(K) = XIMAG(K) + TIMAG
                 
-!         PRINT *,""
+         PRINT *,""
          
-!         PRINT "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
-!                  "XREAL(",K+N2,")_2=XREAL(",K,")-",TREAL,"=",XREAL(K+N2)
-!         PRINT "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
-!                  "XREAL(",K+N2,")_2=XIMAG(",K,")-",TIMAG,"=",XIMAG(K+N2)   
+         PRINT "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
+                  "XREAL(",K+N2,")_2=XREAL(",K,")-",TREAL,"=",XREAL(K+N2)
+         PRINT "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
+                  "XREAL(",K+N2,")_2=XIMAG(",K,")-",TIMAG,"=",XIMAG(K+N2)   
                 
-!         PRINT  "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
-!                 "XREAL(",K,")_2=XREAL(",K,")+",TREAL,"=",XREAL(K)  
-!         PRINT  "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
-!                 "XREAL(",K,")_2=XIMAG(",K,")+",TIMAG,"=",XIMAG(K)  
+         PRINT  "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
+                 "XREAL(",K,")_2=XREAL(",K,")+",TREAL,"=",XREAL(K)  
+         PRINT  "(a,i4,a,i4,a,f20.16,4X,a,f20.16)",& 
+                 "XREAL(",K,")_2=XIMAG(",K,")+",TIMAG,"=",XIMAG(K)  
 
          K=K+1   !GO TO THE NEXT NODE
          
@@ -235,21 +243,21 @@ T4 = S-1
 !   ELSE  (L > NU) !WE PROCEED TO UNSCRAMBLE THE FINAL RESULTS
 !======UNSCRAMBLE THE COMPUTED RESULTS BY BIT INVERSION==============   
        
-!       PRINT *, "================================================="       
+       PRINT *, "================================================="       
 200     PRINT *, ""
-!       PRINT *, "K_1=",K
+       PRINT *, "K_1=",K
        CALL INTEGER2BINARY(K,NU,I_BINARY)
        
-!       PRINT *, "I_BINARY=", I_BINARY 
+       PRINT *, "I_BINARY=", I_BINARY 
        
        CALL REVERSED_BINARY(I_BINARY,I_BINARY_REVERSED)
 
-!       PRINT *, "I_BINARY_REVERSED=",I_BINARY_REVERSED
+       PRINT *, "I_BINARY_REVERSED=",I_BINARY_REVERSED
       
        CALL BINARY2INTEGER (I_BINARY_REVERSED,I_INTEGER)
 
-!       PRINT *, "I_INTEGER=",I_INTEGER
-!       PRINT *, "===================================================="
+       PRINT *, "I_INTEGER=",I_INTEGER
+       PRINT *, "===================================================="
 
 ! DO Y=0, S-1
 
@@ -264,23 +272,23 @@ T4 = S-1
 !THIS STEP IS NECESSARY TO PROHIBIT THE ALTERING OF PREVIOUSLY UNSCRAMBLED NODES.
              
         IF (I_INTEGER < K) THEN
-!             PRINT *, ""
-!             PRINT *, "====I_INTEGER < K====="
-!             PRINT "(a,i4)", "I_INTEGER=",I_INTEGER
-!             PRINT "(a,i4)", "K=",K
-!             PRINT *, ""
-!             PRINT *, "K_2=",K
+             PRINT *, ""
+             PRINT *, "====I_INTEGER < K====="
+             PRINT "(a,i4)", "I_INTEGER=",I_INTEGER
+             PRINT "(a,i4)", "K=",K
+             PRINT *, ""
+             PRINT *, "K_2=",K
              GO TO 300
          
         ELSE
-!            PRINT *, ""
-!            PRINT *, "======UNSCRABLE========="
-!            PRINT "(a,i4,a,f20.16)", "XREAL_K(",K,")_1=",XREAL(K)
-!            PRINT "(a,i4,a,f20.16)", "XIMAG_K(",K,")_1=",XIMAG(K)
-!            PRINT "(a,i4,a,f20.16)", &
-!                  "XREAL_I(",I_INTEGER,")_1=",XREAL(I_INTEGER)
-!            PRINT "(a,i4,a,f20.16)", &
-!                  "XIMAG_I(",I_INTEGER,")_1=",XIMAG(I_INTEGER)
+            PRINT *, ""
+            PRINT *, "======UNSCRABLE========="
+            PRINT "(a,i4,a,f20.16)", "XREAL_K(",K,")_1=",XREAL(K)
+            PRINT "(a,i4,a,f20.16)", "XIMAG_K(",K,")_1=",XIMAG(K)
+            PRINT "(a,i4,a,f20.16)", &
+                  "XREAL_I(",I_INTEGER,")_1=",XREAL(I_INTEGER)
+            PRINT "(a,i4,a,f20.16)", &
+                  "XIMAG_I(",I_INTEGER,")_1=",XIMAG(I_INTEGER)
             
             TREAL = XREAL(K)
             TIMAG = XIMAG(K)
@@ -290,12 +298,12 @@ T4 = S-1
             XREAL(I_INTEGER) = TREAL
             XIMAG(I_INTEGER) = TIMAG
 
-!            PRINT "(a,i4,a,f20.16)", "XREAL_K(",K,")_2=",XREAL(K)
-!            PRINT "(a,i4,a,f20.16)", "XIMAG_K(",K,")_2=",XIMAG(K)
-!            PRINT "(a,i4,a,f20.16)", &
-!                  "XREAL_I(",I_INTEGER,")_2=",XREAL(I_INTEGER)
-!            PRINT "(a,i4,a,f20.16)", &
-!                  "XIMAG_I(",I_INTEGER,")_2=",XIMAG(I_INTEGER)
+            PRINT "(a,i4,a,f20.16)", "XREAL_K(",K,")_2=",XREAL(K)
+            PRINT "(a,i4,a,f20.16)", "XIMAG_K(",K,")_2=",XIMAG(K)
+            PRINT "(a,i4,a,f20.16)", &
+                  "XREAL_I(",I_INTEGER,")_2=",XREAL(I_INTEGER)
+            PRINT "(a,i4,a,f20.16)", &
+                  "XIMAG_I(",I_INTEGER,")_2=",XIMAG(I_INTEGER)
  
             GO TO 300
          
@@ -307,7 +315,7 @@ T4 = S-1
 !             PRINT *, ""
 !             PRINT *, ""
              !PRINT *, "XREAL(0)=", XREAL(5)
-!             PRINT *, "*****YOU COMPLETELY CALCULATED FFT*****"
+             PRINT *, "*****YOU COMPLETELY CALCULATED FFT*****"
              !=====OUTPUTDATA=========================================    
              DO Z=0, S-1
 
@@ -315,8 +323,8 @@ T4 = S-1
                      XREAL(Z),"XIMAG(",Z,")=",XIMAG(Z)      
                !PRINT *, "XREAL(",Z,")=",XREAL(Z)
                 
-               WRITE(11,*) XREAL(Z),XIMAG(Z)
-               !WRITE(11,*) ,XIMAG(Z)
+!               WRITE(11,*) XREAL(Z),XIMAG(Z)
+                WRITE(11,*) XREAL(Z)
              END DO
              
          ELSE

@@ -2,7 +2,7 @@ Program FFT
 IMPLICIT NONE
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: S=32   !THE NUMBER OF SAMPLE POINT
+INTEGER,PARAMETER :: S=256  !THE NUMBER OF SAMPLE POINT
 INTEGER           :: N=S        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
 REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
@@ -21,8 +21,8 @@ INTEGER :: I_INTEGER
 
 !REAL*8, PARAMETER :: JEX=-2*pi/S
 REAL*8 :: ARG
-REAL*8, DIMENSION(S) :: XREAL
-REAL*8, DIMENSION(S) :: XIMAG
+REAL*8, DIMENSION(0:S-1) :: XREAL
+REAL*8, DIMENSION(0:S-1) :: XIMAG
 REAL*8 :: TREAL
 REAL*8 :: TIMAG
 REAL*8 :: CC
@@ -35,7 +35,7 @@ INTEGER :: T4 !TEMPORARY VALUE
 
 !INTEGER :: BD !BINARY DIGIT
 INTEGER :: t, br, CT, Y, Z, ALLOCATESTATUS
-INTEGER, PARAMETER :: BS =32
+INTEGER, PARAMETER :: BS =64
 INTEGER, DIMENSION(BS) :: K_BINARY
 INTEGER, DIMENSION(BS) :: K_BINARY_SCALED
 INTEGER, DIMENSION(BS) :: K_BINARY_SCALED_REVERSED
@@ -51,12 +51,14 @@ f=1
 XREAL=0
 
 Do t=0, S-1
-
-   XREAL(t)=cos(2*pi*f*(t)/(S-1))
-
+   XREAL(t)=sin(2*pi*f*(t)/(S-1))
    WRITE(10,*) XREAL(t)
-
 END DO 
+ 
+!Do t=0, S-1
+!   XREAL(t)=1
+!  WRITE(10,*) XREAL(t)
+!END DO 
  
 NU = 0
 T1 = 0
@@ -159,10 +161,10 @@ T4 = S-1
 
 !               PRINT "(a,i4,a,f20.16,4X,a,i4,a,f20.16)", "XREAL(",Z,")=",&
 !                     XREAL(Z),"XIMAG(",Z,")=",XIMAG(Z)      
-              WRITE(11,*) XREAL(Z),XIMAG(Z)
+!              WRITE(11,*) XREAL(Z),XIMAG(Z)
+               WRITE(11,*) XREAL(Z)
             END DO
-             
-             STOP
+            
 
          ELSE
 
@@ -174,7 +176,7 @@ T4 = S-1
     END IF
 
 
-STOP
+
 
 CONTAINS
 
