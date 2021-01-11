@@ -2,14 +2,14 @@ Program FFT
 IMPLICIT NONE
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: S=32   !THE NUMBER OF SAMPLE POINT
+INTEGER,PARAMETER :: S=4096  !THE NUMBER OF SAMPLE POINT
 INTEGER           :: N=S        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
 REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
 
 INTEGER :: N2                 !THE SPACING BETWEEN DUAL NODES
 
-INTEGER :: NU                 !GAMMA 
+INTEGER :: NU                 !GAMMA  
 INTEGER :: L                  !GAMMA FOR DO LOOP (ARRAY NUMBER BEING CONSIDERED)                 
 
 INTEGER :: P
@@ -19,91 +19,115 @@ INTEGER :: I                  !THIS COUNTER MONITORS THE NUMBER OF DUAL NODE PAI
 INTEGER :: I_INTEGER
  
 
-!REAL*8, PARAMETER :: JEX=-2*pi/S
 REAL*8 :: ARG
 REAL*8, DIMENSION(S) :: XREAL
 REAL*8, DIMENSION(S) :: XIMAG
-REAL*8 :: TREAL
-REAL*8 :: TIMAG
+REAL*8 :: TREAL_K
+REAL*8 :: TIMAG_K
+REAL*8 :: TREAL_I
+REAL*8 :: TIMAG_I
+
 REAL*8 :: CC
 REAL*8 :: SS
-
 
 REAL*8 :: T1  !TEMPORARY VALUE
 REAL*8 :: T3  !TEMPORARY VALUE
 INTEGER :: T4 !TEMPORARY VALUE
+INTEGER :: t,  Z
 
-!INTEGER :: BD !BINARY DIGIT
-INTEGER :: t, br, CT, Y, Z, ALLOCATESTATUS
-INTEGER, PARAMETER :: BS =32
-INTEGER, DIMENSION(BS) :: K_BINARY
-INTEGER, DIMENSION(BS) :: K_BINARY_SCALED
-INTEGER, DIMENSION(BS) :: K_BINARY_SCALED_REVERSED
-INTEGER, DIMENSION(BS) :: I_BINARY
-INTEGER, DIMENSION(BS) :: I_BINARY_REVERSED
+INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY
+INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED
+INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED_REVERSED
+INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY
+INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY_REVERSED
 
-INTEGER :: f
 
-OPEN(10, FILE="sine_testFFT.txt", status='replace')
-OPEN(11, FILE="output_testFFT.txt",status='replace')
+OPEN(10, FILE="output_testFFT.txt", STATUS="old",FORM="FORMATTED",ACTION='READ')
+OPEN(11, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
 
-f=1
-XREAL=0
 
-Do t=0, S-1
-
-   XREAL(t)=cos(2*pi*f*(t)/(S-1))
-
-   WRITE(10,*) XREAL(t)
-
-END DO 
- 
-NU = 0
+XREAL = 0
+XIMAG = 0
 T1 = 0
-T3 = 0 
-K = 0
-L = 1
-!BD = 0
+T3 = 0
 T4 = 0
-   
+P = 0
+P_INTEGER = 0
+I = 0
+I_INTEGER = 0
+K = 0
+N2 = 0
+NU = 0
+NU1 = 0
+CC = 0
+SS = 0
+ARG = 0
+L = 1
+
+
+READ(10,*) XREAL, XIMAG 
+
 DO 
-
   IF (N==1) EXIT
-
-  N=INT(N/2)
+  N=N/2
   NU=NU+1
-
 END DO
 
-NU1 = NU - L
+ALLOCATE(K_BINARY(NU))
+ALLOCATE(K_BINARY_SCALED(NU))
+ALLOCATE(K_BINARY_SCALED_REVERSED(NU))
+ALLOCATE(I_BINARY(NU))
+ALLOCATE(I_BINARY_REVERSED(NU))
+
+NU1 = NU - 1
 N2 = S / 2**(L)
 
-T4 = S-1   
-
-!THE LAST VALUE OF THE K! I NEED THIS VALUE TO GET THE DIGIT OF 
-!THE MOST LARGE BINARY VALUE IN THIS CALCUATION.
+T4 = S-1 !THE LAST VALUE OF THE K! I NEED THIS VALUE TO GET THE DIGIT OF 
+         !THE MOST LARGE BINARY VALUE IN THIS CALCUATION.
 
 150 IF(L<=NU) THEN
  
 140      I=1
-      
+  
 130      CALL INTEGER2BINARY(K,NU,K_BINARY)
          CALL SCALE2RIGHT(K_BINARY,NU1,K_BINARY_SCALED)
          CALL REVERSED_BINARY(K_BINARY_SCALED,K_BINARY_SCALED_REVERSED)  
          CALL BINARY2INTEGER(K_BINARY_SCALED_REVERSED,P_INTEGER)
-         
+
          ARG = 2*pi*P_INTEGER/S
  
          CC = COS(ARG)
          SS = SIN(ARG)
-      
-         TREAL = XREAL(K+N2) * CC + XIMAG(K+N2) * SS
-         TIMAG = XIMAG(K+N2) * CC - XREAL(K+N2) * SS    
+        
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   
+!        XREAL(K) = DEFINED ABOVE
+!        XIMAG(K) = 0
+         
+!         X(K) = XREAL(K) + j XIMAG(K)
+!         X(K+N2) = XREAL(K+N2) + j XIMAG(K+N2)
+!         X(K+N2) * W^p
+           
+!        ** [FOURIER TRANSFORM]
+!         =[XREAL(K+N2) + j XIMAG(K+N2) * (COS(ARG) - j SIN(ARG)]
+                
+!         =[ XREAL(K+N2) * COS(ARG) + XIMAG(K+N2) *  SIN(ARG)]
+!          j [ XIMAG(K+N2) * COS(ARG) -  XREAL(K+N 2) * SIN(ARG) ]  
+!
+!        ** [INVERSE FOURIER TRANSFORM!
+!         =[XREAL(K+N2) + j XIMAG(K+N2) * (COS(ARG) + j SIN(ARG)]
+         
+!         =[ XREAL(K+N2) * COS(ARG) - XIMAG(K+N2) *  SIN(ARG)]
+!          j [ XIMAG(K+N2) * COS(ARG) +  XREAL(K+N 2) * SIN(ARG) ]  
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+         TREAL_K = XREAL(K+N2) * CC - XIMAG(K+N2) * SS
+         TIMAG_K = XIMAG(K+N2) * CC + XREAL(K+N2) * SS
 
-         XREAL(K+N2) = XREAL(K) - TREAL
-         XIMAG(K+N2) = XIMAG(K) - TIMAG
-         XREAL(K) = XREAL(K) + TREAL
-         XIMAG(K) = XIMAG(K) + TIMAG
+         XREAL(K+N2) = XREAL(K) - TREAL_K
+         XIMAG(K+N2) = XIMAG(K) - TIMAG_K
+     
+         XREAL(K) = XREAL(K) + TREAL_K
+         XIMAG(K) = XIMAG(K) + TIMAG_K
                 
          K=K+1   !GO TO THE NEXT NODE
          
@@ -120,7 +144,7 @@ T4 = S-1
                   N2 = N2/2
                   NU1 = NU1 -1
                   K = 0
-                  GO TO 150
+                  GO TO 150  !GO TO THE NEXT ARRAY
               
               END IF   
                  
@@ -137,18 +161,18 @@ T4 = S-1
 200    CALL INTEGER2BINARY(K,NU,I_BINARY)           
        CALL REVERSED_BINARY(I_BINARY,I_BINARY_REVERSED)
        CALL BINARY2INTEGER (I_BINARY_REVERSED,I_INTEGER)
-             
+        
         IF (I_INTEGER < K) THEN
             GO TO 300         
         ELSE
            
-            TREAL = XREAL(K)
-            TIMAG = XIMAG(K)
+            TREAL_I = XREAL(K)
+            TIMAG_I = XIMAG(K)
 
             XREAL(K) = XREAL(I_INTEGER)
             XIMAG(K) = XIMAG(I_INTEGER)
-            XREAL(I_INTEGER) = TREAL
-            XIMAG(I_INTEGER) = TIMAG
+            XREAL(I_INTEGER) = TREAL_I
+            XIMAG(I_INTEGER) = TIMAG_I
 
             GO TO 300
                    
@@ -159,7 +183,10 @@ T4 = S-1
 
 !               PRINT "(a,i4,a,f20.16,4X,a,i4,a,f20.16)", "XREAL(",Z,")=",&
 !                     XREAL(Z),"XIMAG(",Z,")=",XIMAG(Z)      
+!              WRITE(11,*) XREAL(Z)
               WRITE(11,*) XREAL(Z),XIMAG(Z)
+!              PRINT *, XREAL(Z), XIMAG(Z)
+!              PRINT *, XREAL(Z)
             END DO
              
              STOP
@@ -173,8 +200,12 @@ T4 = S-1
 
     END IF
 
+DEALLOCATE(K_BINARY)
+DEALLOCATE(K_BINARY_SCALED)
+DEALLOCATE(K_BINARY_SCALED_REVERSED)
+DEALLOCATE(I_BINARY)
+DEALLOCATE(I_BINARY_REVERSED)
 
-STOP
 
 CONTAINS
 
@@ -182,7 +213,7 @@ SUBROUTINE INTEGER2BINARY(I,NU,B)
 IMPLICIT NONE
     INTEGER, INTENT(IN) :: I
     INTEGER, INTENT(IN) :: NU
-    INTEGER, DIMENSION (:), INTENT(OUT) :: B
+    INTEGER, DIMENSION (NU), INTENT(OUT) :: B
     INTEGER :: C,J,L
 
     B = 0 
@@ -191,8 +222,7 @@ IMPLICIT NONE
     DO C=NU,1,-1
     
        IF(MOD(J,2)==0) THEN
-         B(C) = 0
-       
+         B(C) = 0    
        ELSE
          B(C) = 1
        END IF
@@ -236,7 +266,7 @@ IMPLICIT NONE
 
 INTEGER, DIMENSION(:) :: K_BINARY_SCALED
 INTEGER, DIMENSION(:), INTENT(OUT) :: K_BINARY_SCALED_REVERSED
-INTEGER :: I,CT,NU
+INTEGER :: I,NU
      
         DO I=1,SIZE(K_BINARY_SCALED)
        
@@ -265,3 +295,5 @@ P_INTEGER=0
 END SUBROUTINE
 
 END PROGRAM FFT
+
+

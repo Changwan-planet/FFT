@@ -1,35 +1,106 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from scipy.fft import fft, ifft
+from scipy.fftpack import fft,fftfreq, ifft
+import pandas as pd
 
+#real=np.zeros(4096)
+#imag=np.zeros(4096)
 
 input_path="/home/Changwan/Fortran/FFT/sine_testFFT.txt"
+input_path2="/home/Changwan/Fortran/FFT/IFFT_output.txt"
+
 output_path="/home/Changwan/Fortran/FFT/output_testFFT.txt"
 
-Source=np.loadtxt(input_path)
-Output=np.loadtxt(output_path)
+Input = np.loadtxt(input_path)
+Input2=np.loadtxt(input_path2)	
+Output = np.loadtxt(output_path)
+
+Input_2 = pd.DataFrame(Input)	
+Input2_2 = pd.DataFrame(Input2)
+Output_2  =pd.DataFrame(Output)
+
+S = 4096
 
 
-plt.subplot(3,1,1)
-plt.plot(Source)
-plt.title("SOURCE")
+#++++FFT_GRAPH+++++++++++++++
+
+plt.subplot(3,2,1)
+plt.plot(Input_2.loc[:,0])
+plt.title("INPUT_REAL")
 plt.grid()
 plt.minorticks_on()
 
-plt.subplot(3,1,2)
-plt.plot(Output)
-plt.title("FFT")
+
+plt.subplot(3,2,2)
+plt.plot(Input_2.loc[:,1])
+plt.title("INPUT_IMAG")
 plt.grid()
 plt.minorticks_on()
 
-#print (Source)
-FFT_scipy = fft(Source)
 
-plt.subplot(3,1,3)
-plt.plot(FFT_scipy)	
-plt.title("FFT FROM SCIPY")
+plt.subplot(3,2,3)
+plt.plot(Output_2.loc[:,0])
+plt.title("FFT_REAL FROM SUN")
 plt.grid()
 plt.minorticks_on()
 
+
+plt.subplot(3,2,4)
+plt.plot(Output_2.loc[:,1])
+plt.title("FFT_IMAG FROM SUN")
+plt.grid()
+plt.minorticks_on()
+
+
+t = np.arange(S)
+sp = fft(Input_2.loc[:,0].values)
+freq = fftfreq(t.shape[-1])
+plt.subplot(3,2,5)
+plt.plot(sp.real)
+plt.title("FFT_real_FROM SCIPY")
+plt.grid()
+plt.minorticks_on()
+
+
+plt.subplot(3,2,6)	
+plt.plot(sp.imag)
+plt.title("FFT_imag_FROM SCIPY")
+plt.grid()
+plt.minorticks_on()
+
+#+++++++++++++++++++++++++++++++++++
+
+#++++IFFT_GRAPTH+++++++++++++
+plt.subplot(2,2,1)
+plt.plot(Input2_2.loc[:,0])
+plt.title("IFFT_OUTPUT_REAL")
+plt.grid()
+plt.minorticks_on()
+
+
+plt.subplot(2,2,2)
+plt.plot(Input2_2.loc[:,1])
+plt.title("IFFT_OUTPUT_IMAG")
+plt.grid()
+plt.minorticks_on()
+
+plt.subplot(2,2,3)
+plt.plot(Input2_2.loc[:,0])
+plt.title("IFFT_OUTPUT_REAL_PYTHON")
+plt.grid()
+plt.minorticks_on()
+
+
+plt.subplot(2,2,4)
+plt.plot(Input2_2.loc[:,1])
+plt.title("IFFT_OUTPUT_IMAG_PYTHON")
+plt.grid()
+plt.minorticks_on()
+#+++++++++++++++++++++++++++++
+
+
+plt.tight_layout()
 plt.show()
+
+
