@@ -7,16 +7,8 @@ import pandas as pd
 import math
 
 #GPR_SIGNAL
-#input_path="/home/changwan/GPR/A_SCOPE_GPR2.txt"
-#output_path="/home/changwan/FFT/FFT_GPR_output.txt"
-
-
-#TEST_SIGNAL
-input_path="/home/changwan/FFT/sine_testFFT.txt"
-#input_path2="/home/changwan/FFT/IFFT_output.txt"
-output_path="/home/changwan/FFT/output_testFFT.txt"
-
-
+input_path="/home/changwan/GPR/A_SCOPE_GPR2.txt"
+output_path="/home/changwan/FFT/FFT_GPR_output.txt"
 
 Input = np.loadtxt(input_path)
 #Input2=np.loadtxt(input_path2)	
@@ -34,7 +26,7 @@ columns = ['fft_real_from_sun','fft_imag_from_sun','fft_magnitude_from_sun']
 Output_2  = pd.DataFrame(Output, index, columns)
 
 
-S = 32                                  #Sampling points
+S = 4096                              #Sampling points
 Input_2.loc[:,1]=0                    #zero initialization of the imaginary input
 py_mag=np.zeros(S)
 sp = fft(Input_2.loc[:,0].values)     #fft result from scipy fft
@@ -45,7 +37,7 @@ py_mag =  np.abs(sp)                  #calcaulating amplitude from scipy
 #    +++++++++++
 
 
-ti = 10                                 #tick interval                               
+ti = S/4                                #tick interval                               
 t_sam_in=0.25                           #time_sampling_interval
 f_sam_in=1.0/(t_sam_in*S)               #frequency_sampling_interval
 xt=np.arange(0,S-1, ti)
