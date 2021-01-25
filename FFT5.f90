@@ -2,7 +2,7 @@ Program FFT
 IMPLICIT NONE
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: S=4096  !THE NUMBER OF SAMPLE POINT
+INTEGER,PARAMETER :: S=32  !THE NUMBER OF SAMPLE POINT
 INTEGER           :: N=S        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
 REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
@@ -20,8 +20,13 @@ INTEGER :: I_INTEGER
  
 
 REAL*8 :: ARG
-REAL*8, DIMENSION(S) :: XREAL
-REAL*8, DIMENSION(S) :: XIMAG
+REAL*8, DIMENSION(0:S-1) :: xreal
+REAL*8, DIMENSION(0:S-1) :: ximag
+REAL*8, DIMENSION(0:S-1) :: magnitude
+
+REAL*8 :: xreal_value
+REAL*8 :: t_sampling_interval
+
 REAL*8 :: TREAL_K
 REAL*8 :: TIMAG_K
 REAL*8 :: TREAL_I
@@ -33,7 +38,7 @@ REAL*8 :: SS
 REAL*8 :: T1  !TEMPORARY VALUE
 REAL*8 :: T3  !TEMPORARY VALUE
 INTEGER :: T4 !TEMPORARY VALUE
-INTEGER :: t,  Z
+INTEGER :: t,  Z, zz,zzz
 
 INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED
@@ -41,12 +46,12 @@ INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED_REVERSED
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY_REVERSED
 
-INTEGER :: f
+REAL :: f
 
 OPEN(10, FILE="sine_testFFT.txt", status='replace')
 OPEN(11, FILE="output_testFFT.txt",status='replace')
 
-f = 50
+f = 1.0/8.0
 
 XREAL = 0
 XIMAG = 0
@@ -67,11 +72,30 @@ ARG = 0
 L = 1
 
 !++++++++++++INPUTDATA++++++++++++++++
-Do t=0, S-1
-   XREAL(t)=SIN(2*pi*f*(t)/(S-1))
+!Do t=0, S-1
+!   XREAL(t)=COS(2*pi*f*t/(S-1)) 
 !   PRINT *, XREAL(t),XIMAG(t)  
-   WRITE(10,*) XREAL(t),XIMAG(t)
-END DO 
+!   WRITE(10,*) XREAL(t),XIMAG(t)
+!END DO 
+
+t_sampling_interval = 0.25
+
+Do t=0,S-1 
+ 
+   IF(t == 0) THEN  
+      
+      xreal (t) = 1.0/2.0
+   
+   ELSE 
+ 
+      xreal_value = -t*t_sampling_interval
+      xreal (t) = exp(xreal_value) 
+   
+   END IF 
+
+END DO
+
+
 
 !Do t=0,S-1 
 !   IF(t<=2047) THEN  
@@ -81,10 +105,10 @@ END DO
 !   END IF
 !END DO
 
-!Do t=0,S-1
-!   PRINT *, XREAL(t),XIMAG(t)
-!   WRITE(10,*) XREAL(t),XIMAG(t)
-!END DO
+DO t=0,S-1
+   PRINT *, xreal(t), ximag(t)
+   WRITE(10,*) xreal(t), ximag(t)
+END DO
 
 DO 
   IF (N==1) EXIT
@@ -200,16 +224,38 @@ T4 = S-1
         END IF
             
 300      IF (K==(S-1)) THEN
-            DO Z=0, S-1
 
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!+++++++++++++++++++++++++++++++++++output+++++++++++++++++++++++++++++++++++++++++++++
+
+!            +++++++++++++++++real part and imaginart part++++++++++++++++++
+!            DO Z=0, S-1
+!
 !               PRINT "(a,i4,a,f20.16,4X,a,i4,a,f20.16)", "XREAL(",Z,")=",&
 !                     XREAL(Z),"XIMAG(",Z,")=",XIMAG(Z)      
 !              WRITE(11,*) XREAL(Z)
-              WRITE(11,*) XREAL(Z),XIMAG(Z)
+!!              WRITE(11,*) XREAL(Z),XIMAG(Z)
 !              PRINT *, XREAL(Z), XIMAG(Z)
 !              PRINT *, XREAL(Z)
+!            END DO
+          
+!               +++++++++++ 
+!           +++++amplitude+++++ 
+!               +++++++++++ 
+            DO  zz = 0, S-1
+                magnitude(zz) = SQRT( xreal(zz)**2 + ximag(zz)**2)              
+            END DO 
+         
+!           ++++++++++++++++++++++++write+++++++++++++++++++++++++++++++++
+            DO zzz = 0, S-1
+               WRITE(11,*) xreal(zzz), ximag(zzz), magnitude(zzz)
             END DO
              
+                
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+   
              STOP
 
          ELSE

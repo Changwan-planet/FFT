@@ -8,13 +8,14 @@ import math
 
 #GPR_SIGNAL
 input_path="/home/changwan/GPR/A_SCOPE_GPR2.txt"
+input_path2="/home/changwan/FFT/IFFT_output.txt"
 output_path="/home/changwan/FFT/FFT_GPR_output.txt"
 
 Input = np.loadtxt(input_path)
-#Input2=np.loadtxt(input_path2)	
+Input2=np.loadtxt(input_path2)	
 
 Input_2 = pd.DataFrame(Input)	
-#Input2_2 = pd.DataFrame(Input2)
+Input2_2 = pd.DataFrame(Input2)
 
 Output = np.loadtxt(output_path)
 index = np.linspace(0, (Output.shape[0]-1), Output.shape[0], dtype = 'int64')
@@ -31,6 +32,9 @@ Input_2.loc[:,1]=0                    #zero initialization of the imaginary inpu
 py_mag=np.zeros(S)
 sp = fft(Input_2.loc[:,0].values)     #fft result from scipy fft
 py_mag =  np.abs(sp)                  #calcaulating amplitude from scipy
+
+isp = np.fft.ifft(Output_2.loc[:,0].values,Ouput_2.loc[:,1].values)
+
 
 #    +++++++++++ 
 #+++++FFT_GRAPH+++++
@@ -51,7 +55,7 @@ Output_2["fft_magnitude_from_scipy"] = py_mag
 print(Output_2.head())
 
 
-plt.subplot(3,3,1)
+plt.subplot(5,3,1)
 plt.plot(Input_2.loc[:,0])
 plt.title("input_real")
 plt.xticks(xt,(i*t_sam_in for i in xt))
@@ -61,7 +65,7 @@ plt.xlabel("TIME")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,2)
+plt.subplot(5,3,2)
 plt.plot(Input_2.loc[:,1])
 plt.title("input_imag")
 plt.xticks(xt,(i*t_sam_in for i in xt))
@@ -71,7 +75,7 @@ plt.xlabel("TIME")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,4)
+plt.subplot(5,3,4)
 plt.plot(Output_2["fft_real_from_sun"])
 plt.title("fft_real_from_sun")
 plt.xticks(xt,(i*f_sam_in for i in xt))
@@ -81,7 +85,7 @@ plt.xlabel("FREQUENCY")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,5)
+plt.subplot(5,3,5)
 plt.plot(Output_2["fft_imag_from_sun"])
 plt.title("fft_imag_from_sun")
 plt.xticks(xt,(i*f_sam_in for i in xt))
@@ -91,7 +95,7 @@ plt.xlabel("FREQUENCY")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,6)
+plt.subplot(5,3,6)
 plt.plot(Output_2["fft_magnitude_from_sun"].loc[0:S/2])
 plt.title("fft_magnitude_from_sun")
 plt.xticks(xt2,(i*f_sam_in for i in xt2))
@@ -101,7 +105,7 @@ plt.xlabel("FREQUENCY")
 plt.ylabel("MAGNITUDE")
 
 
-plt.subplot(3,3,7)
+plt.subplot(5,3,7)
 plt.plot(sp.real)
 plt.title("fft_real_from_scipy")
 plt.xticks(xt,(i*f_sam_in for i in xt))
@@ -111,7 +115,7 @@ plt.xlabel("FREQUENCY")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,8)
+plt.subplot(5,3,8)
 plt.plot(sp.imag)
 plt.title("fft_imag_from_scipy")
 plt.xticks(xt,(i*f_sam_in for i in xt))
@@ -121,7 +125,7 @@ plt.xlabel("FREQUENCY")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,9)
+plt.subplot(5,3,9)
 plt.plot(Output_2["fft_magnitude_from_scipy"].loc[0:S/2])
 plt.title("fft_magnitude from scipy")
 plt.xticks(xt2,(i*f_sam_in for i in xt2))
@@ -129,6 +133,51 @@ plt.grid()
 plt.minorticks_on()
 plt.xlabel("FREQUENCY")
 plt.ylabel("MAGNITUDE")
+
+
+
+
+plt.subplot(5,3,10)
+plt.plot(Input2_2.loc[:,0])
+plt.title("ifft_real_from_sun")
+plt.xticks(xt,(i*t_sam_in for i in xt))
+plt.grid()
+plt.minorticks_on()
+plt.xlabel("TIME")
+plt.ylabel("AMPLITUDE")
+
+
+plt.subplot(5,3,11)
+plt.plot(Input2_2.loc[:,1])
+plt.title("ifft_imag_from_sun")
+plt.xticks(xt,(i*t_sam_in for i in xt))
+plt.grid()
+plt.minorticks_on()
+plt.xlabel("TIME")
+plt.ylabel("AMPLITUDE")
+
+plt.subplot(5,3,13)
+plt.plot(isp.real)
+plt.title("ifft_real_from_scipy")
+plt.xticks(xt,(i*t_sam_in for i in xt))
+plt.grid()
+plt.minorticks_on()
+plt.xlabel("TIME")
+plt.ylabel("AMPLITUDE")
+
+
+plt.subplot(5,3,14)
+plt.plot(isp.imag)
+plt.title("ifft_imag_from_scipy")
+plt.xticks(xt,(i*t_sam_in for i in xt))
+plt.grid()
+plt.minorticks_on()
+plt.xlabel("TIME")
+plt.ylabel("AMPLITUDE")
+
+
+
+
 
 
 plt.tight_layout()

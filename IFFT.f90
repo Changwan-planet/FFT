@@ -1,4 +1,4 @@
-Program FFT
+Program IFFT
 IMPLICIT NONE
 
 !INPUT DATA & INITIALIZATION
@@ -20,8 +20,8 @@ INTEGER :: I_INTEGER
  
 
 REAL*8 :: ARG
-REAL*8, DIMENSION(S) :: XREAL
-REAL*8, DIMENSION(S) :: XIMAG
+REAL*8, DIMENSION(0:S-1) :: xreaL
+REAL*8, DIMENSION(0:S-1) :: ximag
 REAL*8 :: TREAL_K
 REAL*8 :: TIMAG_K
 REAL*8 :: TREAL_I
@@ -42,9 +42,10 @@ INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY_REVERSED
 
 
-OPEN(10, FILE="output_testFFT.txt", STATUS="old",FORM="FORMATTED",ACTION='READ')
-OPEN(11, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
-
+!OPEN(10, FILE="output_testFFT.txt", STATUS="old",FORM="FORMATTED",ACTION='READ')
+OPEN(10, FILE="/home/changwan/FFT/FFT_GPR_output.txt", STATUS="old", FORM="FORMATTED", ACTION='READ')
+!OPEN(20, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
+OPEN(20, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
 
 XREAL = 0
 XIMAG = 0
@@ -184,7 +185,7 @@ T4 = S-1 !THE LAST VALUE OF THE K! I NEED THIS VALUE TO GET THE DIGIT OF
 !               PRINT "(a,i4,a,f20.16,4X,a,i4,a,f20.16)", "XREAL(",Z,")=",&
 !                     XREAL(Z),"XIMAG(",Z,")=",XIMAG(Z)      
 !              WRITE(11,*) XREAL(Z)
-              WRITE(11,*) XREAL(Z),XIMAG(Z)
+              WRITE(20,*) XREAL(Z),XIMAG(Z)
 !              PRINT *, XREAL(Z), XIMAG(Z)
 !              PRINT *, XREAL(Z)
             END DO
@@ -294,6 +295,6 @@ P_INTEGER=0
 
 END SUBROUTINE
 
-END PROGRAM FFT
+END PROGRAM IFFT
 
 
