@@ -30,7 +30,8 @@ index = np.linspace(0, (Output.shape[0]-1), Output.shape[0], dtype = 'int64')
 #print(Output.shape[0])
 #print(Output.shape[1])
 
-columns = ['fft_real_from_sun','fft_imag_from_sun','fft_magnitude_from_sun']
+#columns = ['fft_real_from_sun','fft_imag_from_sun','fft_magnitude_from_sun']
+columns = ['fft_real_from_sun','fft_imag_from_sun']
 Output_2  = pd.DataFrame(Output, index, columns)
 
 
@@ -53,11 +54,12 @@ xt2=np.arange(0,(S/2)-1,ti/2)
 
 Output_2["fft_real_from_scipy"] = sp.real
 Output_2["fft_imag_from_scipy"] = sp.imag
-Output_2["fft_magnitude_from_scipy"] = py_mag
+#Output_2["fft_magnitude_from_scipy"] = py_mag
 
 #Output_2.info()
-print(Output_2.head())
-
+#print(Output_2.head())
+print(sp.real)
+print(sp.imag)
 
 plt.subplot(3,3,1)
 plt.plot(Input_2.loc[:,0])
@@ -99,14 +101,14 @@ plt.xlabel("FREQUENCY")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,6)
-plt.plot(Output_2["fft_magnitude_from_sun"].loc[0:S/2])
-plt.title("fft_magnitude_from_sun")
-plt.xticks(xt2,(i*f_sam_in for i in xt2))
-plt.grid()
-plt.minorticks_on()
-plt.xlabel("FREQUENCY")
-plt.ylabel("MAGNITUDE")
+#plt.subplot(3,3,6)
+#plt.plot(Output_2["fft_magnitude_from_sun"].loc[0:S/2])
+#plt.title("fft_magnitude_from_sun")
+#plt.xticks(xt2,(i*f_sam_in for i in xt2))
+#plt.grid()
+#plt.minorticks_on()
+#plt.xlabel("FREQUENCY")
+#plt.ylabel("MAGNITUDE")
 
 
 plt.subplot(3,3,7)
@@ -129,14 +131,14 @@ plt.xlabel("FREQUENCY")
 plt.ylabel("AMPLITUDE")
 
 
-plt.subplot(3,3,9)
-plt.plot(Output_2["fft_magnitude_from_scipy"].loc[0:S/2])
-plt.title("fft_magnitude from scipy")
-plt.xticks(xt2,(i*f_sam_in for i in xt2))
-plt.grid()
-plt.minorticks_on()
-plt.xlabel("FREQUENCY")
-plt.ylabel("MAGNITUDE")
+#plt.subplot(3,3,9)
+#plt.plot(Output_2["fft_magnitude_from_scipy"].loc[0:S/2])
+#plt.title("fft_magnitude from scipy")
+#plt.xticks(xt2,(i*f_sam_in for i in xt2))
+#plt.grid()
+#plt.minorticks_on()
+#plt.xlabel("FREQUENCY")
+#plt.ylabel("MAGNITUDE")
 
 
 plt.tight_layout()

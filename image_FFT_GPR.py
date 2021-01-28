@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
 from scipy.fftpack import fft,fftfreq, ifft
 import pandas as pd
 import math
 
 #GPR_SIGNAL
+#input_path="/home/changwan/GPR/A_SCOPE_GPR.txt"
 input_path="/home/changwan/GPR/A_SCOPE_GPR2.txt"
 input_path2="/home/changwan/FFT/IFFT_output.txt"
 output_path="/home/changwan/FFT/FFT_GPR_output.txt"
@@ -33,7 +33,7 @@ py_mag=np.zeros(S)
 sp = fft(Input_2.loc[:,0].values)     #fft result from scipy fft
 py_mag =  np.abs(sp)                  #calcaulating amplitude from scipy
 
-isp = np.fft.ifft(Output_2.loc[:,0].values,Ouput_2.loc[:,1].values)
+isp = np.fft.ifft(Output_2.loc[:,0].values,Output_2.loc[:,1].values)
 
 
 #    +++++++++++ 
