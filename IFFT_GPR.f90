@@ -1,8 +1,8 @@
-Program FFT
+Program IFFT
 IMPLICIT NONE
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: S=32  !THE NUMBER OF SAMPLE POINT
+INTEGER,PARAMETER :: S=4096  !THE NUMBER OF SAMPLE POINT
 INTEGER           :: N=S        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
 REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
@@ -20,12 +20,9 @@ INTEGER :: I_INTEGER
  
 
 REAL*8 :: ARG
-REAL*8, DIMENSION(0:S-1) :: xreal
+REAL*8, DIMENSION(0:S-1) :: xreaL
 REAL*8, DIMENSION(0:S-1) :: ximag
-REAL*8, DIMENSION(0:S-1) :: magnitude
-
-REAL*8 :: xreal_value
-REAL*8 :: t_sampling_interval
+!REAL*8, DIMENSION(0:S-1) :: magnitude
 
 REAL*8 :: TREAL_K
 REAL*8 :: TIMAG_K
@@ -38,7 +35,8 @@ REAL*8 :: SS
 REAL*8 :: T1  !TEMPORARY VALUE
 REAL*8 :: T3  !TEMPORARY VALUE
 INTEGER :: T4 !TEMPORARY VALUE
-INTEGER :: t,  Z, zz,zzz
+INTEGER :: t,  Z, zz, zzz, tt
+REAL :: f_sam_in
 
 INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED
@@ -46,12 +44,11 @@ INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED_REVERSED
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY_REVERSED
 
-REAL :: f
 
-OPEN(10, FILE="sine_testFFT.txt", status='replace')
-OPEN(20, FILE="output_testFFT.txt",status='replace')
-
-f = 1.0/8.0
+!OPEN(10, FILE="output_testFFT.txt", STATUS="old",FORM="FORMATTED",ACTION='READ')
+OPEN(10, FILE="/home/changwan/FFT/FFT_GPR_output.txt", STATUS="old", FORM="FORMATTED", ACTION='READ')
+!OPEN(20, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
+OPEN(20, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
 
 XREAL = 0
 XIMAG = 0
@@ -70,45 +67,18 @@ CC = 0
 SS = 0
 ARG = 0
 L = 1
+f_sam_in = 1.0 / S     !S is the number of the sample and at the same time the freqneucny sampling interval frequency
 
-!++++++++++++INPUTDATA++++++++++++++++
-!Do t=0, S-1
-!   XREAL(t)=COS(2*pi*f*t/(S-1)) 
-!   PRINT *, XREAL(t),XIMAG(t)  
-!   WRITE(10,*) XREAL(t),XIMAG(t)
-!END DO 
 
-t_sampling_interval = 0.25
 
-Do t=0,S-1 
- 
-   IF(t == 0) THEN  
-      
-      xreal (t) = 1.0/2.0
-   
-   ELSE 
- 
-      xreal_value = -t*t_sampling_interval
-      xreal (t) = exp(xreal_value) 
-   
-   END IF 
 
+DO tt=0,S-1
+   READ(10,*) xreal(tt), ximag(tt) 
 END DO
 
-
-
-!Do t=0,S-1 
-!   IF(t<=2047) THEN  
-!      XREAL(t) = -1   
-!   ELSE    
-!      XREAL(t) = 1   
-!   END IF
+!DO tt=0,31
+!  PRINT *, xreal(tt), ximag(tt)
 !END DO
-
-DO t=0,S-1
-   PRINT *, xreal(t), ximag(t)
-   WRITE(10,*) xreal(t), ximag(t)
-END DO
 
 DO 
   IF (N==1) EXIT
@@ -125,10 +95,8 @@ ALLOCATE(I_BINARY_REVERSED(NU))
 NU1 = NU - 1
 N2 = S / 2**(L)
 
-T4 = S-1   
-
-!THE LAST VALUE OF THE K! I NEED THIS VALUE TO GET THE DIGIT OF 
-!THE MOST LARGE BINARY VALUE IN THIS CALCUATION.
+T4 = S-1 !THE LAST VALUE OF THE K! I NEED THIS VALUE TO GET THE DIGIT OF 
+         !THE MOST LARGE BINARY VALUE IN THIS CALCUATION.
 
 150 IF(L<=NU) THEN
  
@@ -165,8 +133,8 @@ T4 = S-1
 !          j [ XIMAG(K+N2) * COS(ARG) +  XREAL(K+N 2) * SIN(ARG) ]  
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    
-         TREAL_K = XREAL(K+N2) * CC + XIMAG(K+N2) * SS
-         TIMAG_K = XIMAG(K+N2) * CC - XREAL(K+N2) * SS
+         TREAL_K = XREAL(K+N2) * CC - XIMAG(K+N2) * SS
+         TIMAG_K = XIMAG(K+N2) * CC + XREAL(K+N2) * SS
 
          XREAL(K+N2) = XREAL(K) - TREAL_K
          XIMAG(K+N2) = XIMAG(K) - TIMAG_K
@@ -224,45 +192,40 @@ T4 = S-1
         END IF
             
 300      IF (K==(S-1)) THEN
+            
 
-!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-!+++++++++++++++++++++++++++++++++++output+++++++++++++++++++++++++++++++++++++++++++++
-
-!            +++++++++++++++++real part and imaginart part++++++++++++++++++
-!            DO Z=0, S-1
-!
 !               PRINT "(a,i4,a,f20.16,4X,a,i4,a,f20.16)", "XREAL(",Z,")=",&
 !                     XREAL(Z),"XIMAG(",Z,")=",XIMAG(Z)      
 !              WRITE(11,*) XREAL(Z)
-!!              WRITE(11,*) XREAL(Z),XIMAG(Z)
 !              PRINT *, XREAL(Z), XIMAG(Z)
 !              PRINT *, XREAL(Z)
-!            END DO
-          
-!               +++++++++++ 
-!           +++++magnitude+++++ 
-!               +++++++++++ 
-            DO  zz = 0, S-1
-                magnitude(zz) = SQRT( xreal(zz)**2 + ximag(zz)**2)              
-            END DO 
-         
-!           ++++++++++++++++++++++++write+++++++++++++++++++++++++++++++++
+ 
+!                  +++++++++++   
+!             ++++++magnitude++++++
+!                  +++++++++++
+!              DO zz = 0, S-1
+!                 magnitude(zz) = SQRT( xreal(zz)**2 + ximag(zz)**2)
+!              END DO
 
-            DO zzz = 0, S-1
-               WRITE(20,*) xreal(zzz), ximag(zzz)
-            END DO
+
+!                  ++++++++++++++++++++++++++++++++++++++++++++
+!             ++++++muliplication of frequency sample interval++++++
+!                  ++++++++++++++++++++++++++++++++++++++++++++
+
+               DO zzz= 0 , S-1
+                      xreal(zzz) = f_sam_in * xreal(zzz)  
+                      ximag(zzz) = f_sam_in * ximag(zzz)
+              END DO
+
+
+!                  +++++++
+!             ++++++write++++++
+!                  +++++++   
+              DO zzz = 0, S-1 
+                 WRITE(20,*) xreal(zzz), ximag(zzz)
+              END DO
            
-
-
-!            DO zzz = 0, S-1
-!               WRITE(20,*) xreal(zzz), ximag(zzz), magnitude(zzz)
-!            END DO
              
-                
-!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-   
              STOP
 
          ELSE
@@ -368,6 +331,6 @@ P_INTEGER=0
 
 END SUBROUTINE
 
-END PROGRAM FFT
+END PROGRAM IFFT
 
 

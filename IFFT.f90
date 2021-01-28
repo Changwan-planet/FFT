@@ -2,7 +2,7 @@ Program IFFT
 IMPLICIT NONE
 
 !INPUT DATA & INITIALIZATION
-INTEGER,PARAMETER :: S=4096  !THE NUMBER OF SAMPLE POINT
+INTEGER,PARAMETER :: S=32  !THE NUMBER OF SAMPLE POINT
 INTEGER           :: N=S        !THE NUMBER OF SAMPLE POINT FOR DO LOOP   
 REAL*8, PARAMETER :: pi=Acos(-1.0)
 INTEGER           :: K        !SAMPLE POINT
@@ -22,6 +22,8 @@ INTEGER :: I_INTEGER
 REAL*8 :: ARG
 REAL*8, DIMENSION(0:S-1) :: xreaL
 REAL*8, DIMENSION(0:S-1) :: ximag
+!REAL*8, DIMENSION(0:S-1) :: magnitude
+
 REAL*8 :: TREAL_K
 REAL*8 :: TIMAG_K
 REAL*8 :: TREAL_I
@@ -33,7 +35,8 @@ REAL*8 :: SS
 REAL*8 :: T1  !TEMPORARY VALUE
 REAL*8 :: T3  !TEMPORARY VALUE
 INTEGER :: T4 !TEMPORARY VALUE
-INTEGER :: t,  Z
+INTEGER :: t,  Z, zz, zzz, tt
+REAL :: f_sam_in
 
 INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: K_BINARY_SCALED
@@ -42,8 +45,8 @@ INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY
 INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY_REVERSED
 
 
-!OPEN(10, FILE="output_testFFT.txt", STATUS="old",FORM="FORMATTED",ACTION='READ')
-OPEN(10, FILE="/home/changwan/FFT/FFT_GPR_output.txt", STATUS="old", FORM="FORMATTED", ACTION='READ')
+OPEN(10, FILE="output_testFFT.txt", STATUS="old",FORM="FORMATTED",ACTION='READ')
+!OPEN(10, FILE="/home/changwan/FFT/FFT_GPR_output.txt", STATUS="old", FORM="FORMATTED", ACTION='READ')
 !OPEN(20, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
 OPEN(20, FILE="IFFT_output.txt",STATUS='replace', ACTION='WRITE')
 
@@ -64,9 +67,18 @@ CC = 0
 SS = 0
 ARG = 0
 L = 1
+f_sam_in = 1.0 / S     !S is the number of the sample and at the same time the freqneucny sampling interval frequency
 
 
-READ(10,*) XREAL, XIMAG 
+
+
+DO tt=0,S-1
+   READ(10,*) xreal(tt), ximag(tt) 
+END DO
+
+!DO tt=0,31
+!  PRINT *, xreal(tt), ximag(tt)
+!END DO
 
 DO 
   IF (N==1) EXIT
@@ -180,15 +192,39 @@ T4 = S-1 !THE LAST VALUE OF THE K! I NEED THIS VALUE TO GET THE DIGIT OF
         END IF
             
 300      IF (K==(S-1)) THEN
-            DO Z=0, S-1
+            
 
 !               PRINT "(a,i4,a,f20.16,4X,a,i4,a,f20.16)", "XREAL(",Z,")=",&
 !                     XREAL(Z),"XIMAG(",Z,")=",XIMAG(Z)      
 !              WRITE(11,*) XREAL(Z)
-              WRITE(20,*) XREAL(Z),XIMAG(Z)
 !              PRINT *, XREAL(Z), XIMAG(Z)
 !              PRINT *, XREAL(Z)
-            END DO
+ 
+!                  +++++++++++   
+!             ++++++magnitude++++++
+!                  +++++++++++
+!              DO zz = 0, S-1
+!                 magnitude(zz) = SQRT( xreal(zz)**2 + ximag(zz)**2)
+!              END DO
+
+
+!                  ++++++++++++++++++++++++++++++++++++++++++++
+!             ++++++muliplication of frequency sample interval++++++
+!                  ++++++++++++++++++++++++++++++++++++++++++++
+
+               DO zzz= 0 , S-1
+                      xreal(zzz) = f_sam_in * xreal(zzz)  
+                      ximag(zzz) = f_sam_in * ximag(zzz)
+              END DO
+
+
+!                  +++++++
+!             ++++++write++++++
+!                  +++++++   
+              DO zzz = 0, S-1 
+                 WRITE(20,*) xreal(zzz), ximag(zzz)
+              END DO
+           
              
              STOP
 

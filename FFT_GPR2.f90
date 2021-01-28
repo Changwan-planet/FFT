@@ -49,7 +49,6 @@ INTEGER, DIMENSION(:), ALLOCATABLE :: I_BINARY_REVERSED
 REAL :: f
 
 OPEN(10, FILE="/home/changwan/GPR/A_SCOPE_GPR.txt", STATUS="old",FORM="FORMATTED",ACTION='READ')
-
 OPEN(20, FILE="FFT_GPR_output.txt",STATUS='replace', ACTION='WRITE')
 OPEN(21, FILE="/home/changwan/GPR/A_SCOPE_GPR2.txt", STATUS="replace",ACTION='WRITE')
 
@@ -83,11 +82,13 @@ READ(10,*) XREAL
 !++++++remove DC offset++++++
 !     +++++++++++++++++
 
-    XREAL= XREAL - XREAL(1)
+    XREAL =  XREAL - XREAL(1)
 
 DO yy=0,S-1
-   WRITE(21,*) XREAL(yy)
+   WRITE(21,*) XREAL(yy), XIMAG(yy)
 END DO
+!++++++++++++++++++++++++++++++++++++++
+
 
 DO 
   IF (N==1) EXIT
